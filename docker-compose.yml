@@ -1,0 +1,59 @@
+version: '3'
+
+
+services:
+  silver-journey-frontend:
+    image: nikolaik/python-nodejs:python3.11-nodejs21
+    volumes:
+      - ./assets:${CONTAINER_BASE_DIR}/assets
+      - ./silver_journey:${CONTAINER_BASE_DIR}/silver_journey
+      - ./.REFLEX_README.md:${CONTAINER_BASE_DIR}/.REFLEX_README.md
+      - ./main.py:${CONTAINER_BASE_DIR}/main.py
+      - ./README.md:${CONTAINER_BASE_DIR}/README.md
+      - ./rxconfig.py:${CONTAINER_BASE_DIR}/rxconfig.py
+      - ./requirements.txt:${CONTAINER_BASE_DIR}/requirements.txt
+      - ./.web:${CONTAINER_BASE_DIR}/.web
+    working_dir: ${CONTAINER_BASE_DIR}
+    command: ["/bin/sh", "-c", "pip install -r requirements.txt && rm -rf .web && reflex init && reflex run --frontend-only"]
+    env_file:
+      - .env
+    environment:
+      - POSTGRES_HOSTNAME=db
+      - POSTGRES_PORT=5432
+    depends_on:
+      - db
+    ports:
+      - "${FRONTEND_PORT}:${FRONTEND_PORT}"
+
+  silver-journey-backend:
+    image: nikolaik/python-nodejs:python3.11-nodejs21
+    volumes:
+      - ./assets:${CONTAINER_BASE_DIR}/assets
+      - ./silver_journey:${CONTAINER_BASE_DIR}/silver_journey
+      - ./.REFLEX_README.md:${CONTAINER_BASE_DIR}/.REFLEX_README.md
+      - ./main.py:${CONTAINER_BASE_DIR}/main.py
+      - ./README.md:${CONTAINER_BASE_DIR}/README.md
+      - ./rxconfig.py:${CONTAINER_BASE_DIR}/rxconfig.py
+      - ./requirements.txt:${CONTAINER_BASE_DIR}/requirements.txt
+      - ./.web:${CONTAINER_BASE_DIR}/.web
+    working_dir: ${CONTAINER_BASE_DIR}
+    command: ["/bin/sh", "-c", "pip install -r requirements.txt && reflex run --backend-only"]
+    env_file:
+      - .env
+    environment:
+      - POSTGRES_HOSTNAME=db
+      - POSTGRES_PORT=5432
+    depends_on:
+      - db
+      - silver-journey-frontend
+    ports:
+      - "${BACKEND_PORT}:${BACKEND_PORT}"
+
+  db:
+    image: postgres
+    volumes:
+      - ./postgresql/data:/var/lib/postgresql/data
+    env_file:
+      - .env
+    ports:
+      - "${POSTGRES_PORT}:5432"
