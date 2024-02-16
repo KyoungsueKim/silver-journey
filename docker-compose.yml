@@ -14,7 +14,7 @@ services:
       - ./requirements.txt:${CONTAINER_BASE_DIR}/requirements.txt
       - ./.web:${CONTAINER_BASE_DIR}/.web
     working_dir: ${CONTAINER_BASE_DIR}
-    command: ["/bin/sh", "-c", "pip install -r requirements.txt && rm -rf .web && reflex init && reflex run --frontend-only"]
+    command: ["/bin/bash", "-c", "python3 -m venv .venv && source .venv/bin/activate && pip install -r requirements.txt && reflex init && reflex run --frontend-only"]
     env_file:
       - .env
     environment:
@@ -37,7 +37,7 @@ services:
       - ./requirements.txt:${CONTAINER_BASE_DIR}/requirements.txt
       - ./.web:${CONTAINER_BASE_DIR}/.web
     working_dir: ${CONTAINER_BASE_DIR}
-    command: ["/bin/sh", "-c", "pip install -r requirements.txt && reflex run --backend-only"]
+    command: ["/bin/sh", "-c", "python3 -m venv .venv && source .venv/bin/activate && pip install -r requirements.txt && reflex run --backend-only"]
     env_file:
       - .env
     environment:
